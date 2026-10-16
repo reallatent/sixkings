@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>六位帝皇玩</title>
+<style>
+:root{--bg:#fafafa;--card:#fff;--ink:#222;--sub:#777;--line:#eee;--accent:#3b6ef5}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);line-height:1.7}
+a{color:inherit;text-decoration:none}
+nav{display:flex;gap:8px;justify-content:center;padding:14px;background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10;flex-wrap:wrap}
+nav button{font-size:15px;color:var(--sub);padding:6px 16px;border-radius:8px;border:none;background:none;cursor:pointer;font-family:inherit}
+nav button:hover,nav button.on{color:var(--accent);background:#f0f4ff}
+.wrap{max-width:960px;margin:0 auto;padding:36px 20px 80px}
+.view{display:none}.view.on{display:block}
+h1{text-align:center;font-size:30px;margin:8px 0 4px}
+.slogan{text-align:center;color:var(--sub);margin-bottom:30px}
+.hero{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:34px}
+@media(max-width:640px){.hero{grid-template-columns:1fr}}
+.hero img{width:100%;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.08)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:640px){.grid{grid-template-columns:repeat(2,1fr)}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:24px 14px;text-align:center;cursor:pointer;transition:.2s}
+.card:hover{transform:translateY(-3px);box-shadow:0 6px 18px rgba(0,0,0,.08);border-color:var(--accent)}
+.card img{width:84px;height:84px;border-radius:50%;object-fit:cover;margin-bottom:12px;border:3px solid #f0f4ff}
+.card h3{font-size:17px}
+.card p{font-size:13px;color:var(--sub);margin-top:4px}
+.record{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 20px;margin-bottom:12px;display:flex;gap:16px;align-items:flex-start;cursor:pointer;transition:.2s}
+.record:hover{border-color:var(--accent);box-shadow:0 4px 14px rgba(0,0,0,.06)}
+.record .no{flex:none;width:32px;height:32px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600}
+.record h3{font-size:15px}
+.record p{color:var(--sub);font-size:14px;margin-top:2px}
+.record .thumbs{display:flex;gap:6px;margin-top:10px}
+.record .thumbs img{width:52px;height:52px;object-fit:cover;border-radius:6px}
+.tag{display:inline-block;font-size:12px;padding:1px 10px;border-radius:10px;background:#f0f4ff;color:var(--accent);margin-left:8px;vertical-align:2px}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;align-items:center;justify-content:center;padding:20px}
+.modal.on{display:flex}
+.modal-box{background:#fff;border-radius:16px;max-width:640px;width:100%;max-height:88vh;overflow-y:auto;padding:40px 32px;text-align:center;position:relative}
+.close{position:absolute;top:12px;right:18px;font-size:26px;color:#999;cursor:pointer;background:none;border:none}
+.modal-box img.av{width:120px;height:120px;border-radius:50%;object-fit:cover;border:4px solid #f0f4ff}
+.modal-box h2{margin-top:14px;font-size:24px}
+.modal-box .role{color:var(--accent);font-size:14px;margin:2px 0 16px}
+.meta{display:flex;justify-content:center;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.meta span{background:#f5f5f5;border-radius:8px;padding:5px 13px;font-size:13px;color:#555}
+.modal-box p.desc{color:#555;text-align:left;font-size:15px}
+.photos{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+@media(max-width:520px){.photos{grid-template-columns:1fr}}
+.photos img{width:100%;border-radius:10px;cursor:zoom-in;transition:.2s}
+.photos img:hover{opacity:.85}
+.no-photo{margin-top:18px;color:#bbb;font-size:14px;display:none}
+#lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:200;align-items:center;justify-content:center;cursor:zoom-out}
+#lightbox.on{display:flex}
+#lightbox img{max-width:94vw;max-height:94vh;border-radius:6px}
+footer{text-align:center;color:#bbb;font-size:13px;padding:20px 0 30px}
+
+.carousel{position:relative;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08);aspect-ratio:4/3;background:#ddd;touch-action:pan-y;cursor:grab;user-select:none}
+.carousel:active{cursor:grabbing}
+.track{display:flex;height:100%;transition:transform .45s cubic-bezier(.22,.61,.36,1);will-change:transform}
+.track img{flex:0 0 100%;width:100%;height:100%;object-fit:cover;pointer-events:none;display:block}
+.carousel.dragging .track{transition:none}
+.dots{position:absolute;bottom:10px;left:0;right:0;display:flex;gap:7px;justify-content:center;z-index:5}
+.dots i{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.5);cursor:pointer;transition:.3s}
+.dots i.on{background:#fff}
+.arrow{position:absolute;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.28);color:#fff;border:none;font-size:18px;cursor:pointer;z-index:5;display:flex;align-items:center;justify-content:center;opacity:0;transition:.25s}
+.carousel:hover .arrow{opacity:1}
+.arrow:hover{background:rgba(0,0,0,.45)}
+.arrow.prev{left:10px}.arrow.next{right:10px}
+@media(max-width:640px){.arrow{display:none}}
+</style>
+</head>
+<body>
+
+<nav>
+  <button class="on" data-view="home">首页</button>
+  <button data-view="members">成员介绍</button>
+  <button data-view="records">团建记录</button>
+</nav>
+
+<div class="wrap view on" id="view-home">
+  <h1>六位帝皇玩</h1>
+  <p class="slogan">六位帝皇集结 · 团魂之心燃不灭</p>
+  <div class="carousel" id="carousel"></div>
+  <div class="grid" id="home-grid"></div>
+</div>
+
+<div class="wrap view" id="view-members">
+  <h1>成员介绍</h1>
+  <p class="slogan">点击卡片查看每位帝皇的档案</p>
+  <div class="grid" id="member-grid"></div>
+</div>
+
+<div class="wrap view" id="view-records">
+  <h1>团建记录</h1>
+  <p class="slogan">来自《六位帝皇玩团建档案》· 点击任意记录查看现场照片</p>
+  <div id="record-list"></div>
+</div>
+
+<footer>六位帝皇玩 · 团魂之心燃不灭</footer>
+
+<div class="modal" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box">
+    <button class="close" onclick="closeModal()">×</button>
+    <img class="av" id="m-av" src="" alt="">
+    <h2 id="m-name"></h2>
+    <p class="role" id="m-role"></p>
+    <div class="meta"><span id="m-nick"></span><span id="m-no"></span><span>所属：六位帝皇玩</span></div>
+    <p class="desc" id="m-desc"></p>
+  </div>
+</div>
+
+<div class="modal" id="rmodal" onclick="if(event.target===this)closeRec()">
+  <div class="modal-box">
+    <button class="close" onclick="closeRec()">×</button>
+    <h2 id="r-title"></h2>
+    <p class="role" id="r-tag"></p>
+    <p class="desc" id="r-desc" style="text-align:center"></p>
+    <div class="photos" id="r-photos"></div>
+    <p class="no-photo" id="r-nophoto">本次出行暂无照片留存</p>
+  </div>
+</div>
+
+<div id="lightbox" onclick="this.classList.remove('on')">
+  <img id="lb-img" src="" alt="">
+</div>
+
+<script>
+const MEMBERS = [
+  {name:"蒋雨来", slug:"jiangyulai", role:"扛把子 / 气氛担当", nick:"蒋国平国蒋",
+   desc:"团队核心人物，走到哪儿都自带气场。合照最左边那位带着自信笑容的就是他。主打一个\u201c鸽\u201d字哲学——优购愿雨不再鸽。"},
+  {name:"徐衍聪", slug:"xuyancong", role:"颜值担当 / 冷面笑匠", nick:"五万步暴走王",
+   desc:"戴眼镜的冷静观察者，表面高冷实则笑点极低。关键时刻总能一句冷笑话让全队破防。"},
+  {name:"翟嘉东", slug:"zhaijiadong", role:"快乐源泉 / 大笑担当", nick:"翟月月月翟",
+   desc:"标志性露齿大笑，出镜率极高。团建氛围引擎，有他在就没有冷场的时候。"},
+  {name:"刘思博", slug:"liusibo", role:"首席策划 / 行程总指挥", nick:"地点由他指定",
+   desc:"团队的首席策划，\u201c去哪玩\u201d这件事从来都是他说了算——每次出行的地点全部由刘思博指定，从南开大悦城、方特、沐青汤泉到蓟县滑雪，行程表就是他的作品。作为回报，漫展、汤泉、生日局一场不落，拍照永远稳站 C 位附近，刘海也永远最整齐。"},
+  {name:"楼子彦", slug:"louziyan", role:"团魂核心 / 主场担当", nick:"海龙",
+   desc:"本名楼子彦，绰号\u201c海龙\u201d，团建档案里的高频主角。潮玩街区\u201c海龙零一五零二\u201d的操作担当，生日有滨寿司蛋糕庆生，家里开过多次\u201c基地\u201d——过年去海龙家、第一次住海龙家、开学前去海龙家过夜，还有那场\u201c不眠之夜\u201d。团魂之心燃不灭，多半是围着他燃的。"},
+  {name:"陈见新", slug:"chenjianxin", role:"技术担当 / 手游大腿", nick:"不眠之夜主谋",
+   desc:"潮玩街区的电竞搭子，操作风格\u201c下饭\u201d但梗密度极高。海龙家过夜\u201c不眠之夜\u201d的主要当事人之一，与蒋雨来并称\u201c陈蒋二人难入睡\u201d。"},
+];
+const RECORDS = [
+  {title:"初二五一第一次漫展", tag:"拉完了", desc:"刘珺瑶在场，五人皆尬穿", photos:["images/rec1.jpg"]},
+  {title:"六个人前往南开大悦城", tag:"夯", desc:"六位帝皇玩集结，团魂之心燃不灭", photos:["images/rec2.jpg"]},
+  {title:"五人暑假漫展行", tag:"人上人", desc:"五人组初来乍到，陌生间面面相貌", photos:["images/rec3.jpg"]},
+  {title:"半个班方特团建", tag:"夯", desc:"方特烤肉齐相会，二班牛逼勇敢飞", photos:["images/rec4.jpg"]},
+  {title:"沐青汤泉第一次团建", tag:"顶尖", desc:"洗浴玩耍两不误，帝皇玩享受服务", photos:["images/rec5.jpg"]},
+  {title:"潮玩街区团建", tag:"顶尖", desc:"海龙零一五零二，操作下饭挺丢面", photos:["images/rec6.jpg"]},
+  {title:"南开高一中秋晚会团建", tag:"顶级到夯", desc:"六位帝皇各奔东西，重返南开中秋相聚", photos:["images/rec7.jpg"]},
+  {title:"水裹汤泉团建", tag:"人上人", desc:"水裹汤泉吃水果，空调房里叹调空", photos:["images/rec8.jpg"]},
+  {title:"季景天地看疯狂动物城2", tag:"人上人", desc:"蒋国平国蒋，翟月月月翟", photos:["images/rec9.jpg"]},
+  {title:"过年去海龙家", tag:"拉完了", desc:"无处游玩，空荡悲切", photos:["images/rec10.jpg"]},
+  {title:"蓟县滑雪", tag:"夯", desc:"长眠一晚精神好，滑雪场累但满足", photos:["images/rec11.jpg"]},
+  {title:"海龙过生日", tag:"顶尖", desc:"滨寿司蛋糕美味，海龙长命且百岁", photos:["images/rec12.jpg"]},
+  {title:"国平过生日", tag:"顶尖", desc:"国平愿望国家平，优购愿雨不再鸽", photos:["images/rec13.jpg"]},
+  {title:"第一次住海龙家", tag:"人上人", desc:"布衾多年冷似铁，娇儿恶卧踏里裂", photos:["images/rec14.jpg"]},
+  {title:"水上乐园耍", tag:"夯", desc:"一夜优眠，一天大耍，一生难忘", photos:["images/rec15.jpg"]},
+  {title:"市里城市赛", tag:"npc", desc:"斋月疯魔为省钱，未打先败空悲切", photos:["images/rec16.jpg"]},
+  {title:"开学前去海龙家过夜", tag:"拉完了", desc:"陈蒋二人难入睡，不眠之夜做结尾", photos:["images/rec10.jpg"]},
+  {title:"国庆漫展行", tag:"夯爆了", desc:"五人尽兴去漫展，日行千里步五万", photos:["images/rec17.jpg"]},
+  {title:"夜晚小酌", tag:"人上人", desc:"时间紧任务重，四人爽聊附送", photos:["images/rec18.jpg"]},
+  {title:"卡乐布大店赛", tag:"npc", desc:"卡比兽拦人心态，最意难平大店赛", photos:["images/rec10.jpg"]},
+];
+const av = s => "images/av_" + s + ".png";
+const card = m => '<div class="card" onclick="openModal(\'' + m.slug + '\')">'
+  + '<img src="' + av(m.slug) + '" alt="' + m.name + '"><h3>' + m.name + '</h3><p>' + m.role + '</p></div>';
+document.getElementById('home-grid').innerHTML = MEMBERS.map(card).join('');
+document.getElementById('member-grid').innerHTML = MEMBERS.map(card).join('');
+document.getElementById('record-list').innerHTML = RECORDS.map(function(r,i){
+  const th = (r.photos||[]).slice(0,3).map(function(p){return '<img src="'+p+'" alt="" loading="lazy">'}).join('');
+  return '<div class="record" onclick="openRec(' + i + ')"><div class="no">' + (i+1)
+    + '</div><div style="flex:1"><h3>' + r.title + '<span class="tag">' + r.tag + '</span></h3><p>'
+    + r.desc + '</p>' + (th ? '<div class="thumbs">' + th + '</div>' : '') + '</div></div>';
+}).join('');
+
+document.querySelectorAll('nav button').forEach(function(b){
+  b.onclick = function(){
+    document.querySelectorAll('nav button').forEach(function(x){x.classList.remove('on')});
+    document.querySelectorAll('.view').forEach(function(v){v.classList.remove('on')});
+    b.classList.add('on');
+    document.getElementById('view-' + b.dataset.view).classList.add('on');
+    window.scrollTo({top:0});
+  };
+});
+function openModal(slug){
+  const m = MEMBERS.find(function(x){return x.slug===slug});
+  document.getElementById('m-av').src = av(slug);
+  document.getElementById('m-name').textContent = m.name;
+  document.getElementById('m-role').textContent = m.role;
+  document.getElementById('m-nick').textContent = '称号：' + m.nick;
+  document.getElementById('m-no').textContent = '编号：0' + (MEMBERS.indexOf(m)+1);
+  document.getElementById('m-desc').textContent = m.desc;
+  document.getElementById('modal').classList.add('on');
+}
+function closeModal(){ document.getElementById('modal').classList.remove('on'); }
+function openRec(i){
+  const r = RECORDS[i];
+  document.getElementById('r-title').textContent = (i+1) + '. ' + r.title;
+  document.getElementById('r-tag').textContent = '评价：' + r.tag;
+  document.getElementById('r-desc').textContent = r.desc;
+  document.getElementById('r-photos').innerHTML = r.photos.map(function(p){
+    return '<img src="' + p + '" alt="" loading="lazy" onclick="event.stopPropagation();showLb(this.src)">';
+  }).join('');
+  document.getElementById('r-nophoto').style.display = r.photos.length ? 'none' : 'block';
+  document.getElementById('rmodal').classList.add('on');
+}
+function closeRec(){ document.getElementById('rmodal').classList.remove('on'); }
+function showLb(src){
+  document.getElementById('lb-img').src = src;
+  document.getElementById('lightbox').classList.add('on');
+}
+document.addEventListener('keydown', function(e){
+  if(e.key==='Escape'){ closeModal(); closeRec(); document.getElementById('lightbox').classList.remove('on'); }
+});
+
+// 首页轮播（支持拖拽滑动）
+const SLIDES = ["images/slide1.jpg","images/slide2.jpg","images/slide3.jpg","images/slide4.jpg","images/slide5.jpg"];
+const car = document.getElementById('carousel');
+car.innerHTML = '<div class="track" id="track">'
+  + SLIDES.map(function(s,i){return '<img src="'+s+'" alt="团建瞬间'+(i+1)+'" draggable="false">'}).join('')
+  + '</div>'
+  + '<button class="arrow prev" aria-label="上一张">&#8249;</button>'
+  + '<button class="arrow next" aria-label="下一张">&#8250;</button>'
+  + '<div class="dots">' + SLIDES.map(function(_,i){
+      return '<i'+(i===0?' class="on"':'')+' data-i="'+i+'"></i>';}).join('') + '</div>';
+
+const track = document.getElementById('track');
+let cur = 0, timer = null, startX = 0, delta = 0, dragging = false;
+
+function render(animate){
+  if(!animate) track.classList.add('dragging');
+  track.style.transform = 'translateX(' + (-cur * 100) + '%)';
+  if(!animate) requestAnimationFrame(function(){ track.classList.remove('dragging'); });
+  car.querySelectorAll('.dots i').forEach(function(d,i){ d.classList.toggle('on', i===cur); });
+}
+function go(n){ cur = (n + SLIDES.length) % SLIDES.length; render(true); }
+function startAuto(){ clearInterval(timer); timer = setInterval(function(){ go(cur+1); }, 3500); }
+
+// 拖拽 / 滑动
+function onDown(e){
+  dragging = true; startX = (e.touches ? e.touches[0].clientX : e.clientX); delta = 0;
+  track.classList.add('dragging'); clearInterval(timer);
+}
+function onMove(e){
+  if(!dragging) return;
+  const x = (e.touches ? e.touches[0].clientX : e.clientX);
+  delta = x - startX;
+  const pct = -cur * 100 + (delta / car.clientWidth) * 100;
+  track.style.transform = 'translateX(' + pct + '%)';
+  if(e.cancelable) e.preventDefault();
+}
+function onUp(){
+  if(!dragging) return;
+  dragging = false;
+  track.classList.remove('dragging');
+  const th = car.clientWidth * 0.18;
+  if(delta < -th) go(cur + 1);
+  else if(delta > th) go(cur - 1);
+  else render(true);
+  startAuto();
+}
+car.addEventListener('mousedown', onDown);
+window.addEventListener('mousemove', onMove);
+window.addEventListener('mouseup', onUp);
+car.addEventListener('touchstart', onDown, {passive:true});
+car.addEventListener('touchmove', onMove, {passive:false});
+car.addEventListener('touchend', onUp);
+car.addEventListener('dragstart', function(e){ e.preventDefault(); });
+
+car.querySelector('.prev').onclick = function(e){ e.stopPropagation(); go(cur-1); startAuto(); };
+car.querySelector('.next').onclick = function(e){ e.stopPropagation(); go(cur+1); startAuto(); };
+car.querySelectorAll('.dots i').forEach(function(d){
+  d.onclick = function(e){ e.stopPropagation(); go(+d.dataset.i); startAuto(); };
+});
+startAuto();
+</script>
+</body>
+</html>
